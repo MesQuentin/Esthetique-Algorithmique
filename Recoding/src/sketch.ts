@@ -11,8 +11,9 @@ const params = {
     Grid_5 : 23,
     Grid_6 : 10,
     Grid_7 : 30,
-    Seed : 0,
 
+    Apocalypse : false,
+    Seed : 0,
     Enhanced : 4,
     SousEspece : false,
     Nocturne : false,
@@ -23,7 +24,7 @@ const params = {
     Download_Image: () => save(),
 }
 
-gui.add(params, "Seed", 0, 100, 1)
+gui.add(params, "Apocalypse")
 gui.add(params, "SousEspece")
 gui.add(params, "Nocturne")
 gui.add(params, "Corail")
@@ -47,7 +48,7 @@ gui.add(params, "Download_Image")
 let LimH = "-1.25*L + height/2 - 40"
 let LimB = "-L + height"
 
-/* Pour retrouver les paramètres de la seconde varaiation :
+/* Pour retrouver les paramètres du second :
 let LimH = "115"
 let LimB = "195"
 */
@@ -192,6 +193,19 @@ function draw() {
         r = color('#c64756')
     }
     
+    if (params.Apocalypse) {
+        
+        // Ce mode est uniquement là dans un but humouristique /!\ Risque épilepsie /!\
+        
+        params.Seed+=minute()
+        const epilepsie = [ color('#d89216'), color('#d44000'), color('#e1d89f'), 
+                            color('#008891'), color('#0f3057'), color('#c64756'),
+                            color('#e7e7de'), color(13, 85, 144), color(246, 165, 0),
+                            color(247, 88, 45) ]
+        b = random(epilepsie)
+        j = random(epilepsie)
+        r = random(epilepsie)
+    }
     randomSeed(params.Seed)
     noFill()
     strokeWeight(params.Stroke_size)
@@ -257,4 +271,3 @@ function setup() {
 function windowResized() {
     p6_ResizeCanvas()
 }
-
