@@ -9,12 +9,18 @@ var params = {
     Grid_7: 30,
     Seed: 0,
     Enhanced: 4,
+    SousEspece: false,
+    Nocturne: false,
+    Corail: false,
     Margin: 30,
     Stroke_size: 5,
     Download_Image: function () { return save(); },
 };
 gui.add(params, "Seed", 0, 100, 1);
-gui.add(params, "Enhanced", 1, 10, 1);
+gui.add(params, "SousEspece");
+gui.add(params, "Nocturne");
+gui.add(params, "Corail");
+gui.add(params, "Enhanced", 3, 10, 1);
 gui.add(params, "Grid_1", 0, 2000, 1);
 gui.add(params, "Grid_2", 0, 700, 1);
 gui.add(params, "Grid_3", 0, 700, 1);
@@ -23,16 +29,17 @@ gui.add(params, "Grid_5", 0, 50, 1);
 gui.add(params, "Grid_6", 0, 50, 1);
 gui.add(params, "Grid_7", 0, 50, 1);
 gui.add(params, "Download_Image");
+var LimH = "-1.25*L + height/2 - 40";
+var LimB = "-L + height";
 function createGridCenter(N) {
     for (var i = 0; i < N; i++) {
         var size = (width - 2 * params.Margin) / params.Enhanced + params.Stroke_size / 2;
         var L = random(width - size - 2 * params.Margin) + params.Margin;
         var H = random(height - size - 2 * params.Margin) + params.Margin;
-        if (H < -L + height && H > -1.25 * L + height / 2 - 40) {
-            square(L - (L % 20) + 15, H - (H % 20) + 15, size, 3);
+        try {
+            eval("\n            if (H < " + LimB + " && H > " + LimH + ") {\n                square( L - (L % 20) + 15, H - (H % 20) + 15, size, 3)\n            }\n            else {\n                i--\n            }\n        ");
         }
-        else {
-            i--;
+        catch (e) {
         }
     }
 }
@@ -41,11 +48,10 @@ function createGridUp(N) {
         var size = (width - 2 * params.Margin) / params.Enhanced + params.Stroke_size / 2;
         var L = random(width - size - 2 * params.Margin) + params.Margin;
         var H = random(height - size - 2 * params.Margin) + params.Margin;
-        if (H < -L + height) {
-            square(L - (L % 20) + 15, H - (H % 20) + 15, size, 3);
+        try {
+            eval("\n            if (H < " + LimB + ") {\n                square( L - (L % 20) + 15, H - (H % 20) + 15, size, 3)\n            }\n            else {\n                i--\n            }\n            ");
         }
-        else {
-            i--;
+        catch (e) {
         }
     }
 }
@@ -54,11 +60,10 @@ function createGridDown(N) {
         var size = (width - 2 * params.Margin) / params.Enhanced + params.Stroke_size / 2;
         var L = random(width - size - 2 * params.Margin) + params.Margin;
         var H = random(height - size - 2 * params.Margin) + params.Margin;
-        if (H > -L + height) {
-            square(L - (L % 20) + 15, H - (H % 20) + 15, size, 3);
+        try {
+            eval("\n                if (H > " + LimB + ") {\n                    square( L - (L % 20) + 15, H - (H % 20) + 15, size, 3)\n                }\n                else {\n                    i--\n                }\n            ");
         }
-        else {
-            i--;
+        catch (e) {
         }
     }
 }
@@ -85,12 +90,24 @@ function createImperfection(N) {
 }
 function draw() {
     background(253, 253, 230);
-    randomSeed(params.Seed);
-    noFill();
-    strokeWeight(params.Stroke_size);
     var b = color(13, 85, 144);
     var j = color(246, 165, 0);
     var r = color(247, 88, 45);
+    if (params.Nocturne) {
+        background(0);
+        b = color('#d89216');
+        j = color('#d44000');
+        r = color('#e1d89f');
+    }
+    if (params.Corail) {
+        background('#e7e7de');
+        b = color('#008891');
+        j = color('#0f3057');
+        r = color('#c64756');
+    }
+    randomSeed(params.Seed);
+    noFill();
+    strokeWeight(params.Stroke_size);
     stroke(j);
     createGridUp(params.Grid_1);
     push();
@@ -98,25 +115,37 @@ function draw() {
     createGridDown(params.Grid_4);
     pop();
     stroke(r);
-    square(55, 55, (width - 2 * params.Margin) / params.Enhanced + params.Stroke_size / 2, 3);
-    createGridCenter(params.Grid_2);
     push();
     translate(random(10, 20), 1);
     createGridDown_2(params.Grid_5);
     pop();
-    push();
-    translate(12, 12);
-    createImperfection(params.Grid_7);
-    translate(43, -19);
-    createImperfection(params.Grid_7);
-    pop();
+    if (!params.SousEspece) {
+        square(55, 55, (width - 2 * params.Margin) / params.Enhanced + params.Stroke_size / 2, 3);
+        push();
+        translate(12, 12);
+        createImperfection(params.Grid_7);
+        translate(43, -19);
+        createImperfection(params.Grid_7);
+        pop();
+    }
+    else {
+        push();
+        translate(random(10, 20), 1);
+        createGridDown(params.Grid_5);
+        pop();
+    }
+    createGridCenter(params.Grid_2);
     stroke(b);
-    square(35, 55, (width - 2 * params.Margin) / params.Enhanced + params.Stroke_size / 2, 3);
+    if (!params.SousEspece) {
+        square(35, 55, (width - 2 * params.Margin) / params.Enhanced + params.Stroke_size / 2, 3);
+    }
     createGridCenter(params.Grid_3);
     createGridDown(params.Grid_6);
 }
 function setup() {
     p6_CreateCanvas();
+    createInput(LimH).input(function (e) { return LimH = e.target.value; });
+    createInput(LimB).input(function (e) { return LimB = e.target.value; });
 }
 function windowResized() {
     p6_ResizeCanvas();
